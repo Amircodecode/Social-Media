@@ -5,3 +5,10 @@ app = FastAPI()
 def say_hello():
     return {"message":"hello"}
 
+@app.get("/")
+def main_menu():
+    return {"server":"ready"}
+
+@app.get("/about")
+def about():
+    return {"name":"amir"}
