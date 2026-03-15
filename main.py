@@ -1,5 +1,13 @@
 from fastapi import FastAPI
+from pydantic import BaseModel, Field, EmailStr
+
 app = FastAPI()
+
+class User(BaseModel):
+    name: str = Field(min_length=2, max_length=50)
+    age: int = Field(ge=0, le=120)
+    email: EmailStr
+
 
 fake_items = [
     {
@@ -32,11 +40,23 @@ async def read_item(item_id: str, q:str | None = None):
     return {"item_id": item_id}
 
 
-@app.get("/search")
-def search(name: str, age: int):
-    return {"name": name, "age": age}
+# @app.get("/search") //
+# def search(name: str, age: int):
+#     return {"name": name, "age": age}
 
 
-@app.get("/user/{user_id}")
+@app.get("/user/{user_id}") 
 def get_user(user_id: int):
-    return {"user_id": user_id}
+    return {"user_id": user_id} # path parametr 
+
+@app.get("/search") #query
+def search(name: str):
+    return {"name": name}
+
+@app.get("/gandon")
+def gandon(name: str, age: int, dildo: int, girl: str):
+    return {"name": name, "age": age, "dildo": dildo, "girl": girl}
+
+@app.post("/register")
+async def register(user: User):
+    return {"message": "user created","received": user}
