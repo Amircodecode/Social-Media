@@ -2,6 +2,11 @@ from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 from sqlalchemy import String, Boolean
 import uuid
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy.ext.asyncio import AsyncSession
+
+
 
 DATABASE_URL = "postgresql+asyncpg://postgres:1234@localhost:5432/socialnet"
 
@@ -22,3 +27,13 @@ class User(Base):
 async def create_tables():
     async with engine.begin() as conn: 
         await conn.run_sync(Base.metadata.create_all)
+        
+        
+        
+# Фабрика сессий — создаёт новую сессию по запросу
+AsyncSessionLocal = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
+
+# Dependency — FastAPI вызывает это автоматически для каждого запроса
+async def get_db():
+    async with AsyncSessionLocal() as session:
+        yield session       
