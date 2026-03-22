@@ -25,3 +25,6 @@ class Article:
     def _validate_content(self):
         if len(self.content) > 10000:
             raise ValueError("Длина статьи должна быть не более 10000 символов")    
+        
+def __post_init__(self):
+        self.validate()

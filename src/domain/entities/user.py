@@ -25,7 +25,9 @@ class User:
         
     def _validate_name_format(self):
         if not re.match(r'^[a-zа-яё\s]+$', self.full_name):
-            raise ValueError("Имя должно содержать только строчные буквы латиницы и кирилицы") 
+            raise ValueError("Имя должно содержать только строчные буквы латиницы и кирилицы")
+        if not (5 < len(self.full_name) < 1000):
+            raise ValueError("Длина имени должна быть от 6 до 999 символов")
         
     def can_create_post(self):
         return self.is_verified
