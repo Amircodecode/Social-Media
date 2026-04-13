@@ -1,40 +1,14 @@
-import re
 import uuid
-from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import datetime
 
-@dataclass
-class User: 
-    email: str
-    full_name: str
-    username: str
-    password: str
-    id: uuid.UUID = field(default_factory=uuid.uuid4)
-    is_verified: bool = False
-    created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
-    updated_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
-    
-    def validate(self):
-        self._validate_name_format()
-        self._validate_email()
-        self._validate_username()
+class User:
+    def __init__(self, email, full_name, password):
+        self.id = uuid.uuid4()
+        self.email = email
+        self.full_name = full_name
+        self.created_at = datetime.now()
+        self.updated_at = datetime.now()
+        self.password = password
+        self.is_verified = False
         
-    def _validate_email(self):
-        if "@" not in self.email:
-            raise ValueError("Некорректный email")
         
-    def _validate_name_format(self):
-        if not re.match(r'^[a-zа-яё\s]+$', self.full_name):
-            raise ValueError("Имя должно содержать только строчные буквы латиницы и кирилицы")
-        if not (5 < len(self.full_name) < 1000):
-            raise ValueError("Длина имени должна быть от 6 до 999 символов")
-        
-    def can_create_post(self):
-        return self.is_verified
-    
-    def _validate_username(self):
-        if not (5 < len(self.username) < 1000):
-            raise ValueError("Длина username должна быть от 6 до 999 символов")
-
-def __post_init__(self):
-        self.validate()

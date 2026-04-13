@@ -1,12 +1,10 @@
+from datetime import datetime
 import uuid
-from dataclasses import dataclass, field
-from datetime import datetime, timezone
 
-@dataclass
 class Comment:
-    content: str
-    author_id: uuid.UUID
-    article_id: uuid.UUID
-    id: uuid.UUID = field(default_factory=uuid.uuid4)
-    created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
-    updated_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
+    def __init__(self, user_id, article_id, content):
+       self.id = uuid.uuid4()
+       self.user_id = user_id
+       self.article_id = article_id
+       self.content = content
+       self.created_at = datetime.now()
