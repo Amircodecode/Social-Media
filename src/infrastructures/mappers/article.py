@@ -1,4 +1,4 @@
-from ..db.models.article import ArticlesTable
+from ..db.models.article import ArticleTable
 from ...domain.entities.article import Article
 
 def to_entity(model):   
@@ -12,7 +12,7 @@ def to_entity(model):
     )
     
 def to_model(entity):
-    return ArticlesTable(
+    return ArticleTable(
         id = entity.id,
         user_id = entity.user_id,
         title = entity.title,
