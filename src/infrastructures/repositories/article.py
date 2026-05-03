@@ -1,15 +1,61 @@
+from ..db.database import SessionLocal
+from ..db.models.article import ArticleTable
+from ..mappers.article import to_model, to_entity
+from ...domain.entities.article import Article
+from sqlalchemy import select
+
 class ArticleRepository:
-    def save(self, article):
-        pass    
-    
-    def find_by_id(self, id):
+    async def save(self, article):
+        async with SessionLocal() as session:
+            model = to_model(article)
+            session.add(model)
+            await session.commit()
+            return to_entity(model)
+
+    async def find_by_id(self, id):
+        async with SessionLocal() as session:
+            result = await session.execute(
+                select(ArticleTable).where(ArticleTable.id == id)
+            )
+            model = result.scalar_one_or_none()
+            if model:
+                return to_entity(model)
+            return None
+
+    async def delete(self, id):
+        async with SessionLocal() as session:
+            result = await session.execute(
+                select(ArticleTable).where(ArticleTable.id == id)
+            )
+            model = result.scalar_one_or_none()
+            if model:
+                await session.delete(model)
+                await session.commit()
+
+    async def find_all(self):
+        async with SessionLocal() as session:
+            result = await session.execute(select(ArticleTable))
+            models = result.scalars().all()
+            return [to_entity(model) for model in models]
+
+    async def update(self, id, article):
+        async with SessionLocal() as session:
+            result = await session.execute(
+                select(ArticleTable).where(ArticleTable.id == id)
+            )
+            model = result.scalar_one_or_none()
+            if model:
+                for key, value in article.dict().items():
+                    setattr(model, key, value)
+                await session.commit()
+                return to_entity(model)
+            return None
         pass
     
-    def delete(self, id):
-        pass
-    
-    def find_all(self, id):
-        pass
-    
-    def update(self, id):
-        pass
+    async def find_by_user_id(self, user_id):
+        async with SessionLocal() as session:
+            result = await session.execute(
+                select(ArticleTable).where(ArticleTable.user_id == user_id)
+            )
+            models = result.scalars().all()
+            return [to_entity(model) for model in models]

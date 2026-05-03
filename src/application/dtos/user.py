@@ -1,6 +1,8 @@
 from pydantic import BaseModel
 from datetime import datetime
 import uuid
+from typing import List
+from .article import ArticleResponse
 
 class UserResponse(BaseModel):
     id: uuid.UUID
@@ -10,5 +12,13 @@ class UserResponse(BaseModel):
     created_at: datetime
     updated_at: datetime
     
+    class Config:
+        from_attributes = True
+        
+        
+class UserWithArticlesResponse(BaseModel):
+    full_name: str
+    articles: List[ArticleResponse] = []
+
     class Config:
         from_attributes = True

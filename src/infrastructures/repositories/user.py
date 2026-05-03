@@ -2,6 +2,9 @@ from ..db.database import SessionLocal
 from ..db.models.user import UserTable
 from ..mappers.user import to_model, to_entity
 from ...domain.entities.user import User
+from sqlalchemy import select
+from sqlalchemy import delete
+from src.infrastructures.db.models.article import ArticleTable
 
 class UserRepository:
     async def save(self, user: User):
@@ -11,13 +14,54 @@ class UserRepository:
             await session.commit()
             return to_entity(model)    
     
-    def find_by_email(self, email):
-        pass
+    async def find_by_email(self, email):
+        async with SessionLocal() as session:
+            result = await session.execute(
+            select(UserTable).where(UserTable.email == email)
+            )
+            model = result.scalar_one_or_none()
+            if model:
+                return to_entity(model)
+            return None
         
-    def find_by_id(self, id):
-        pass
-    def delete(self, user):
-        pass
+    async def find_by_id(self, id):
+        async with SessionLocal() as session:
+            result = await session.execute(
+            select(UserTable).where(UserTable.id == id)
+            )
+            model = result.scalar_one_or_none()
+            if model:
+                return to_entity(model)
+            return None
         
-    def update(self, user):
-        pass
+    async def delete(self, user_id):
+        async with SessionLocal() as session:
+            await session.execute(
+                delete(ArticleTable).where(ArticleTable.user_id == user_id)
+            )
+            result = await session.execute(
+                select(UserTable).where(UserTable.id == user_id)
+            )
+            model = result.scalar_one_or_none()
+            if model:
+                await session.delete(model)
+                await session.commit()
+
+    async def update(self, user):
+        async with SessionLocal() as session:
+            result = await session.execute(
+                select(UserTable).where(UserTable.id == user.id)
+            )
+            model = result.scalar_one_or_none()
+            if model:
+                model.email = user.email
+                model.full_name = user.full_name
+                model.password = user.password
+                await session.commit()
+                return to_entity(model)   
+        
+    async def find_all(self):
+        async with SessionLocal() as session:
+            result = await session.execute(select(UserTable))
+            models = result.scalars().all()
+            return [to_entity(model) for model in models]
