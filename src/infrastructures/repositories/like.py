@@ -17,14 +17,12 @@ class LikeRepository:
                 select(LikeTable).where(LikeTable.article_id == id)
             )
             models = result.scalars().all()
-            if models:
-                return [to_entity(model) for model in models]
-            return None
+            return [to_entity(model) for model in models]
     
     async def delete(self, id):
         async with SessionLocal() as session:
             result = await session.execute(
-                select(LikeTable).where(LikeTable.article_id == id)
+                select(LikeTable).where(LikeTable.id == id)
             )
             model = result.scalar_one_or_none()
             if model:
