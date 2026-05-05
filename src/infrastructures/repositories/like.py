@@ -1,9 +1,32 @@
+from ..db.database import SessionLocal
+from ..db.models.like import LikeTable
+from ..mappers.like import to_model, to_entity
+from sqlalchemy import select   
+
 class LikeRepository:
-    def save(self, like):
-        pass   
+    async def save(self, like):
+        async with SessionLocal() as session:
+            model = to_model(like)
+            session.add(model)
+            await session.commit()
+            return to_entity(model)
         
-    def find_by_article_id(self, id):
-        pass
+    async def find_by_article_id(self, id):
+        async with SessionLocal() as session:
+            result = await session.execute(
+                select(LikeTable).where(LikeTable.article_id == id)
+            )
+            models = result.scalars().all()
+            if models:
+                return [to_entity(model) for model in models]
+            return None
     
-    def delete(self, id):
-        pass
+    async def delete(self, id):
+        async with SessionLocal() as session:
+            result = await session.execute(
+                select(LikeTable).where(LikeTable.article_id == id)
+            )
+            model = result.scalar_one_or_none()
+            if model:
+                await session.delete(model)
+                await session.commit()

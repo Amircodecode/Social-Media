@@ -7,6 +7,7 @@ from src.infrastructures.auth.dependencies import get_current_user
 from src.domain.entities.user import User
 from fastapi import APIRouter, Depends
 from fastapi.security import OAuth2PasswordRequestForm
+from src.infrastructures.auth.password import hash_password
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -33,4 +34,13 @@ async def read_current_user(current_user: User = Depends(get_current_user)):
 async def delete_user(current_user: User = Depends(get_current_user)):
     repository = UserRepository()
     await repository.delete(current_user.id)
-    return {"message": "User deleted successfully"}
+    return {"message": "User deleted successfully!!"}
+
+@router.put("/update", response_model=UserResponse)
+async def update_user(email: str, full_name: str, password: str, current_user: User = Depends(get_current_user)):
+    repository = UserRepository()
+    current_user.email = email
+    current_user.full_name = full_name
+    current_user.password = hash_password(password)
+    updated_user = await repository.update(current_user)
+    return updated_user

@@ -10,6 +10,7 @@ class GetAllArticles:
             articles = await self.article_repository.find_by_user_id(user.id)
             result.append({
                 "full_name": user.full_name,
+                "id": user.id,
                 "articles": articles
             })
         return result

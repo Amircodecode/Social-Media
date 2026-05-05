@@ -3,6 +3,7 @@ from fastapi import FastAPI
 from src.infrastructures.db.database import create_tables
 from src.presentation.api.auth import router as auth_router
 from src.presentation.api.posts import router as posts_router
+from src.presentation.api.comments import router as comments_router
 
 
 @asynccontextmanager
@@ -13,3 +14,4 @@ async def lifespan(app: FastAPI):
 app = FastAPI(lifespan=lifespan)
 app.include_router(auth_router)
 app.include_router(posts_router)
+app.include_router(comments_router)

@@ -45,8 +45,8 @@ class ArticleRepository:
             )
             model = result.scalar_one_or_none()
             if model:
-                for key, value in article.dict().items():
-                    setattr(model, key, value)
+                model.title = article.title
+                model.content = article.content
                 await session.commit()
                 return to_entity(model)
             return None
