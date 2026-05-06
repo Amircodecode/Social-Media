@@ -4,6 +4,7 @@ import uuid
 from typing import List
 from .article import ArticleResponse
 
+
 class UserResponse(BaseModel):
     id: uuid.UUID
     email: str
@@ -11,11 +12,11 @@ class UserResponse(BaseModel):
     is_verified: bool
     created_at: datetime
     updated_at: datetime
-    
+
     class Config:
         from_attributes = True
-        
-        
+
+
 class UserWithArticlesResponse(BaseModel):
     full_name: str
     articles: List[ArticleResponse] = []

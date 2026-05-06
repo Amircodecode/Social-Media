@@ -1,0 +1,25 @@
+[tool.poetry]
+name = "social-media"
+version = "0.1.0"
+package-mode = false
+description = "Social Media API"
+authors = ["Amirjon"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+fastapi = "*"
+uvicorn = "*"
+sqlalchemy = "*"
+asyncpg = "*"
+python-jose = {extras = ["cryptography"], version = "*"}
+passlib = {extras = ["bcrypt"], version = "*"}
+bcrypt = "5.0.0"
+python-multipart = "*"
+apscheduler = "*"
+fastapi-mail = "*"
+itsdangerous = "*"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

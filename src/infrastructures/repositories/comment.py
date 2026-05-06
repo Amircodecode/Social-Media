@@ -1,8 +1,8 @@
 from ..db.database import SessionLocal
 from ..db.models.comment import CommentTable
 from ..mappers.comment import to_model, to_entity
-from ...domain.entities.comment import Comment
 from sqlalchemy import select
+
 
 class CommentRepository:
     async def save(self, comment):
@@ -21,7 +21,7 @@ class CommentRepository:
             if models:
                 return [to_entity(model) for model in models]
             return None
-    
+
     async def delete(self, id):
         async with SessionLocal() as session:
             result = await session.execute(

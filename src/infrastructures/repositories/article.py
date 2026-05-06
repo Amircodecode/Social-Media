@@ -1,8 +1,8 @@
 from ..db.database import SessionLocal
 from ..db.models.article import ArticleTable
 from ..mappers.article import to_model, to_entity
-from ...domain.entities.article import Article
 from sqlalchemy import select
+
 
 class ArticleRepository:
     async def save(self, article):
@@ -50,8 +50,7 @@ class ArticleRepository:
                 await session.commit()
                 return to_entity(model)
             return None
-        pass
-    
+
     async def find_by_user_id(self, user_id):
         async with SessionLocal() as session:
             result = await session.execute(

@@ -2,6 +2,7 @@ from pydantic import BaseModel
 from datetime import datetime
 import uuid
 
+
 class ArticleResponse(BaseModel):
     id: uuid.UUID
     title: str
