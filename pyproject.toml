@@ -14,7 +14,7 @@ sqlalchemy = "*"
 asyncpg = "*"
 python-jose = {extras = ["cryptography"], version = "*"}
 passlib = {extras = ["bcrypt"], version = "*"}
-bcrypt = "5.0.0"
+bcrypt = "4.0.1"
 python-multipart = "*"
 apscheduler = "*"
 fastapi-mail = "*"

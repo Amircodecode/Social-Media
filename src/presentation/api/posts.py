@@ -42,13 +42,6 @@ async def get_all_posts(
     )
 
 
-@router.get("/{id}")
-async def get_post(id: uuid.UUID):
-    article_repository = ArticleRepository()
-    use_case = GetArcticleById(article_repository)
-    return await use_case.execute(id)
-
-
 @router.delete("/delete/{id}")
 async def delete_user(id: uuid.UUID, current_user: User = Depends(get_current_user)):
     article_repository = ArticleRepository()

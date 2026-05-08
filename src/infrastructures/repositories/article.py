@@ -2,6 +2,9 @@ from ..db.database import SessionLocal
 from ..db.models.article import ArticleTable
 from ..mappers.article import to_model, to_entity
 from sqlalchemy import select
+from sqlalchemy import delete as sql_delete
+from src.infrastructures.db.models import LikeTable
+from src.infrastructures.db.models import CommentTable
 
 
 class ArticleRepository:
@@ -24,6 +27,12 @@ class ArticleRepository:
 
     async def delete(self, id):
         async with SessionLocal() as session:
+            await session.execute(
+                sql_delete(LikeTable).where(LikeTable.article_id == id)
+            )
+            await session.execute(
+                sql_delete(CommentTable).where(CommentTable.article_id == id)
+            )
             result = await session.execute(
                 select(ArticleTable).where(ArticleTable.id == id)
             )
