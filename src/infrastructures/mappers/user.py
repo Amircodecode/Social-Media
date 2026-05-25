@@ -1,5 +1,5 @@
-from ..db.models.user import UserTable
-from ...domain.entities.user import User
+from src.infrastructures.db.models.user import UserTable
+from src.domain.entities.user import User
 
 
 def to_entity(model):

@@ -1,5 +1,5 @@
-from ..db.models.like import LikeTable
-from ...domain.entities.like import Like
+from src.infrastructures.db.models.like import LikeTable
+from src.domain.entities.like import Like
 
 
 def to_entity(model):

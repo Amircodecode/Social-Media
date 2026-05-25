@@ -1,7 +1,7 @@
-from ..db.database import SessionLocal
-from ..db.models.user import UserTable
-from ..mappers.user import to_model, to_entity
-from ...domain.entities.user import User
+from src.infrastructures.db.database import SessionLocal
+from src.infrastructures.db.models.user import UserTable
+from src.infrastructures.mappers.user import to_model, to_entity
+from src.domain.entities.user import User
 from sqlalchemy import select
 from sqlalchemy import delete
 from src.infrastructures.db.models.article import ArticleTable

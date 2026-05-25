@@ -1,6 +1,6 @@
-from ..db.database import SessionLocal
-from ..db.models.article import ArticleTable
-from ..mappers.article import to_model, to_entity
+from src.infrastructures.db.database import SessionLocal
+from src.infrastructures.db.models.article import ArticleTable
+from src.infrastructures.mappers.article import to_model, to_entity
 from sqlalchemy import select
 from sqlalchemy import delete as sql_delete
 from src.infrastructures.db.models import LikeTable

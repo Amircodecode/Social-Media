@@ -1,6 +1,6 @@
-from ..db.database import SessionLocal
-from ..db.models.comment import CommentTable
-from ..mappers.comment import to_model, to_entity
+from src.infrastructures.db.database import SessionLocal
+from src.infrastructures.db.models.comment import CommentTable
+from src.infrastructures.mappers.comment import to_model, to_entity
 from sqlalchemy import select
 
 

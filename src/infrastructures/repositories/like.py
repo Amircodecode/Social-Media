@@ -1,6 +1,6 @@
-from ..db.database import SessionLocal
-from ..db.models.like import LikeTable
-from ..mappers.like import to_model, to_entity
+from src.infrastructures.db.database import SessionLocal
+from src.infrastructures.db.models.like import LikeTable
+from src.infrastructures.mappers.like import to_model, to_entity
 from sqlalchemy import select
 
 

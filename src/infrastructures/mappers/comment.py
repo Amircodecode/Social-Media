@@ -1,5 +1,5 @@
-from ..db.models.comment import CommentTable
-from ...domain.entities.comment import Comment
+from src.infrastructures.db.models.comment import CommentTable
+from src.domain.entities.comment import Comment
 
 
 def to_entity(model):

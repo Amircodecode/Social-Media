@@ -2,7 +2,7 @@ from pydantic import BaseModel
 from datetime import datetime
 import uuid
 from typing import List
-from .article import ArticleResponse
+from src.application.dtos.article import ArticleResponse
 
 
 class UserResponse(BaseModel):
