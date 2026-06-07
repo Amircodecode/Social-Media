@@ -1,8 +1,10 @@
 import uuid
+from pydantic import BaseModel, Field
 
 
-class Like:
-    def __init__(self, article_id, user_id, id=None):
-        self.id = id if id is not None else uuid.uuid4()
-        self.article_id = article_id
-        self.user_id = user_id
+class Like(BaseModel):
+    id: uuid.UUID = Field(default_factory=uuid.uuid4)
+    article_id: uuid.UUID
+    user_id: uuid.UUID
+
+    model_config = {"from_attributes": True}

@@ -1,33 +1,24 @@
 import uuid
-from datetime import datetime
-from datetime import timedelta
+from datetime import datetime, timedelta
+from pydantic import BaseModel, Field, field_validator
 
 
-class User:
-    def __init__(
-        self,
-        email,
-        full_name,
-        password,
-        id=None,
-        created_at=None,
-        updated_at=None,
-        is_verified=None,
-        verification_token=None,
-        token_expires_at=None,
-    ):
-        self.id = id if id is not None else uuid.uuid4()
-        self.email = email
-        self.full_name = full_name.lower()
-        self.created_at = created_at if created_at is not None else datetime.now()
-        self.updated_at = updated_at if updated_at is not None else datetime.now()
-        self.password = password
-        self.is_verified = is_verified if is_verified is not None else False
-        self.verification_token = (
-            verification_token if verification_token is not None else uuid.uuid4()
-        )
-        self.token_expires_at = (
-            token_expires_at
-            if token_expires_at is not None
-            else datetime.now() + timedelta(hours=24)
-        )
+class User(BaseModel):
+    id: uuid.UUID = Field(default_factory=uuid.uuid4)
+    email: str
+    full_name: str
+    password: str
+    is_verified: bool = False
+    verification_token: uuid.UUID = Field(default_factory=uuid.uuid4)
+    token_expires_at: datetime = Field(
+        default_factory=lambda: datetime.now() + timedelta(hours=24)
+    )
+    created_at: datetime = Field(default_factory=datetime.now)
+    updated_at: datetime = Field(default_factory=datetime.now)
+
+    model_config = {"from_attributes": True}
+
+    @field_validator("full_name")
+    @classmethod
+    def lowercase_name(cls, v):
+        return v.lower()

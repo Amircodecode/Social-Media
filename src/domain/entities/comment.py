@@ -1,11 +1,13 @@
-from datetime import datetime
 import uuid
+from datetime import datetime
+from pydantic import BaseModel, Field
 
 
-class Comment:
-    def __init__(self, user_id, article_id, content, id=None, created_at=None):
-        self.id = id if id is not None else uuid.uuid4()
-        self.user_id = user_id
-        self.article_id = article_id
-        self.content = content
-        self.created_at = created_at if created_at is not None else datetime.now()
+class Comment(BaseModel):
+    id: uuid.UUID = Field(default_factory=uuid.uuid4)
+    user_id: uuid.UUID
+    article_id: uuid.UUID
+    content: str
+    created_at: datetime = Field(default_factory=datetime.now)
+
+    model_config = {"from_attributes": True}

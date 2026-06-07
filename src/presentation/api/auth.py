@@ -8,20 +8,30 @@ from fastapi import APIRouter, Depends
 from fastapi.security import OAuth2PasswordRequestForm
 from src.infrastructures.auth.password import hash_password
 from datetime import datetime
+from sqlalchemy.ext.asyncio import AsyncSession
+from src.infrastructures.db.database import get_session
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
 
 @router.post("/register", response_model=UserResponse)
-async def register(email: str, full_name: str, password: str):
-    repository = UserRepository()
+async def register(
+    email: str,
+    full_name: str,
+    password: str,
+    session: AsyncSession = Depends(get_session),
+):
+    repository = UserRepository(session)
     use_case = RegisterUser(repository)
     return await use_case.execute(email, full_name, password)
 
 
 @router.post("/login")
-async def login(form_data: OAuth2PasswordRequestForm = Depends()):
-    repository = UserRepository()
+async def login(
+    form_data: OAuth2PasswordRequestForm = Depends(),
+    session: AsyncSession = Depends(get_session),
+):
+    repository = UserRepository(session)
     use_case = LoginUser(repository)
     token = await use_case.execute(form_data.username, form_data.password)
     if token:
@@ -35,8 +45,11 @@ async def read_current_user(current_user: User = Depends(get_current_user)):
 
 
 @router.delete("/delete")
-async def delete_user(current_user: User = Depends(get_current_user)):
-    repository = UserRepository()
+async def delete_user(
+    current_user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_session),
+):
+    repository = UserRepository(session)
     await repository.delete(current_user.id)
     return {"message": "User deleted successfully!!"}
 
@@ -47,18 +60,24 @@ async def update_user(
     full_name: str,
     password: str,
     current_user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_session),
 ):
-    repository = UserRepository()
-    current_user.email = email
-    current_user.full_name = full_name
-    current_user.password = hash_password(password)
-    updated_user = await repository.update(current_user)
+    repository = UserRepository(session)
+    updated_user = await repository.update(
+        current_user.model_copy(
+            update={
+                "email": email,
+                "full_name": full_name,
+                "password": hash_password(password),
+            }
+        )
+    )
     return updated_user
 
 
 @router.get("/verify")
-async def verify_email(token: str):
-    repository = UserRepository()
+async def verify_email(token: str, session: AsyncSession = Depends(get_session)):
+    repository = UserRepository(session)
     user = await repository.find_by_verification_token(token)
     if user and user.token_expires_at > datetime.now():
         user.is_verified = True
