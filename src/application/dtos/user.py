@@ -1,11 +1,11 @@
-from pydantic import BaseModel
 from datetime import datetime
 import uuid
 from typing import List
 from src.application.dtos.article import ArticleResponse
+from src.application.dtos.base import Base
 
 
-class UserResponse(BaseModel):
+class UserResponse(Base):
     id: uuid.UUID
     email: str
     full_name: str
@@ -13,13 +13,7 @@ class UserResponse(BaseModel):
     created_at: datetime
     updated_at: datetime
 
-    class Config:
-        from_attributes = True
 
-
-class UserWithArticlesResponse(BaseModel):
+class UserWithArticlesResponse(Base):
     full_name: str
     articles: List[ArticleResponse] = []
-
-    class Config:
-        from_attributes = True

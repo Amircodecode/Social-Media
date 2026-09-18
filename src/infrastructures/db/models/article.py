@@ -1,16 +1,12 @@
-from sqlalchemy import Column, Text, ForeignKey, DateTime
-from ..base import Base
-import uuid
-from sqlalchemy.sql import func
+from sqlalchemy import Column, Text, ForeignKey
 from sqlalchemy.dialects.postgresql import UUID
+from ..base import Base
+from src.infrastructures.db.mixins import CommonMixin
 
 
-class ArticleTable(Base):
+class ArticleTable(Base, CommonMixin):
     __tablename__ = "articles"
 
-    id = Column(UUID, default=uuid.uuid4(), primary_key=True, nullable=False)
     user_id = Column(UUID, ForeignKey("users.id"), nullable=False)
     title = Column(Text, nullable=False)
     content = Column(Text, nullable=False)
-    created_at = Column(DateTime, nullable=False, default=func.now())
-    updated_at = Column(DateTime, nullable=False, default=func.now())

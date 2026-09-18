@@ -1,12 +1,11 @@
 from sqlalchemy import Column, ForeignKey
-from ..base import Base
-import uuid
 from sqlalchemy.dialects.postgresql import UUID
+from ..base import Base
+from src.infrastructures.db.mixins import CommonMixin
 
 
-class LikeTable(Base):
+class LikeTable(Base, CommonMixin):
     __tablename__ = "likes"
 
-    id = Column(UUID, default=uuid.uuid4(), primary_key=True)
     user_id = Column(UUID, ForeignKey("users.id"), nullable=False)
     article_id = Column(UUID, ForeignKey("articles.id"), nullable=False)

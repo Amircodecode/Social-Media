@@ -1,14 +1,11 @@
-from pydantic import BaseModel
 from datetime import datetime
 import uuid
+from src.application.dtos.base import Base
 
 
-class ArticleResponse(BaseModel):
+class ArticleResponse(Base):
     id: uuid.UUID
     title: str
     content: str
     created_at: datetime
     updated_at: datetime
-
-    class Config:
-        from_attributes = True

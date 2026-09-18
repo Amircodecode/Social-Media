@@ -1,14 +1,12 @@
-from sqlalchemy import Column, Text, DateTime, ForeignKey
-from ..base import Base
-from sqlalchemy.sql import func
+from sqlalchemy import Column, Text, ForeignKey
 from sqlalchemy.dialects.postgresql import UUID
+from ..base import Base
+from src.infrastructures.db.mixins import CommonMixin
 
 
-class CommentTable(Base):
+class CommentTable(Base, CommonMixin):
     __tablename__ = "comments"
 
-    id = Column(UUID, primary_key=True)
     article_id = Column(UUID, ForeignKey("articles.id"), nullable=False)
     content = Column(Text, nullable=False)
-    created_at = Column(DateTime, nullable=False, default=func.now())
     user_id = Column(UUID, ForeignKey("users.id"), nullable=False)
