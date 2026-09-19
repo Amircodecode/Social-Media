@@ -1,29 +1,27 @@
-from src.application.use_cases.register_user import RegisterUser
-from src.infrastructures.repositories.user import UserRepository
-from src.application.dtos.user import UserResponse
-from src.application.use_cases.login_user import LoginUser
-from src.infrastructures.auth.dependencies import get_current_user
-from src.domain.entities.user import User
-from fastapi import APIRouter, Depends
-from fastapi.security import OAuth2PasswordRequestForm
-from src.infrastructures.auth.password import hash_password
 from datetime import datetime
+from fastapi import APIRouter, Depends, HTTPException
+from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.ext.asyncio import AsyncSession
+from src.application.use_cases.register_user import RegisterUser
+from src.application.use_cases.login_user import LoginUser
+from src.application.dtos.user import RegisterRequest, UpdateUserRequest, UserResponse
+from src.infrastructures.repositories.user import UserRepository
+from src.infrastructures.auth.dependencies import get_current_user
+from src.infrastructures.auth.password import hash_password
 from src.infrastructures.db.database import get_session
+from src.infrastructures.db.models.user import UserTable
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
 
-@router.post("/register", response_model=UserResponse)
+@router.post("/register", response_model=UserResponse, status_code=201)
 async def register(
-    email: str,
-    full_name: str,
-    password: str,
+    data: RegisterRequest,
     session: AsyncSession = Depends(get_session),
 ):
     repository = UserRepository(session)
     use_case = RegisterUser(repository)
-    return await use_case.execute(email, full_name, password)
+    return await use_case.execute(data)
 
 
 @router.post("/login")
@@ -36,17 +34,17 @@ async def login(
     token = await use_case.execute(form_data.username, form_data.password)
     if token:
         return {"access_token": token, "token_type": "bearer"}
-    return {"error": "Invalid credentials"}
+    raise HTTPException(status_code=401, detail="Invalid credentials")
 
 
 @router.get("/me", response_model=UserResponse)
-async def read_current_user(current_user: User = Depends(get_current_user)):
+async def read_current_user(current_user: UserTable = Depends(get_current_user)):
     return current_user
 
 
 @router.delete("/delete")
 async def delete_user(
-    current_user: User = Depends(get_current_user),
+    current_user: UserTable = Depends(get_current_user),
     session: AsyncSession = Depends(get_session),
 ):
     repository = UserRepository(session)
@@ -56,21 +54,16 @@ async def delete_user(
 
 @router.put("/update", response_model=UserResponse)
 async def update_user(
-    email: str,
-    full_name: str,
-    password: str,
-    current_user: User = Depends(get_current_user),
+    data: UpdateUserRequest,
+    current_user: UserTable = Depends(get_current_user),
     session: AsyncSession = Depends(get_session),
 ):
     repository = UserRepository(session)
     updated_user = await repository.update(
-        current_user.model_copy(
-            update={
-                "email": email,
-                "full_name": full_name,
-                "password": hash_password(password),
-            }
-        )
+        current_user.id,
+        email=data.email,
+        full_name=data.full_name,
+        password=hash_password(data.password),
     )
     return updated_user
 
@@ -80,7 +73,6 @@ async def verify_email(token: str, session: AsyncSession = Depends(get_session))
     repository = UserRepository(session)
     user = await repository.find_by_verification_token(token)
     if user and user.token_expires_at > datetime.now():
-        user.is_verified = True
-        await repository.update(user)
+        await repository.update(user.id, is_verified=True)
         return {"message": "Email verified successfully!"}
-    return {"error": "Invalid or expired token"}
+    raise HTTPException(status_code=400, detail="Invalid or expired token")

@@ -2,32 +2,26 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, delete
 from src.infrastructures.db.models.user import UserTable
 from src.infrastructures.db.models.article import ArticleTable
-from src.domain.entities.user import User
 
 
 class UserRepository:
     def __init__(self, session: AsyncSession):
         self.session = session
 
-    async def save(self, user: User):
-        model = UserTable(**user.model_dump())
+    async def create(self, **kwargs) -> UserTable:
+        model = UserTable(**kwargs)
         self.session.add(model)
         await self.session.commit()
-        return User.model_validate(model)
+        await self.session.refresh(model)
+        return model
 
-    async def find_by_email(self, email):
+    async def find_by_email(self, email: str) -> UserTable | None:
         result = await self.session.execute(
             select(UserTable).where(UserTable.email == email)
         )
-        model = result.scalar_one_or_none()
-        return User.model_validate(model) if model else None
+        return result.scalar_one_or_none()
 
-    async def find_by_id(self, id):
-        result = await self.session.execute(select(UserTable).where(UserTable.id == id))
-        model = result.scalar_one_or_none()
-        return User.model_validate(model) if model else None
-
-    async def delete(self, user_id):
+    async def delete(self, user_id) -> None:
         await self.session.execute(
             delete(ArticleTable).where(ArticleTable.user_id == user_id)
         )
@@ -39,27 +33,24 @@ class UserRepository:
             await self.session.delete(model)
             await self.session.commit()
 
-    async def update(self, user: User):
+    async def update(self, user_id, **kwargs) -> UserTable | None:
         result = await self.session.execute(
-            select(UserTable).where(UserTable.id == user.id)
+            select(UserTable).where(UserTable.id == user_id)
         )
         model = result.scalar_one_or_none()
         if model:
-            model.email = user.email
-            model.full_name = user.full_name
-            model.password = user.password
-            model.is_verified = user.is_verified
+            for field, value in kwargs.items():
+                setattr(model, field, value)
             await self.session.commit()
-        return User.model_validate(model)
+            await self.session.refresh(model)
+        return model
 
-    async def find_all(self):
+    async def find_all(self) -> list[UserTable]:
         result = await self.session.execute(select(UserTable))
-        models = result.scalars().all()
-        return [User.model_validate(model) for model in models]
+        return list(result.scalars().all())
 
-    async def find_by_verification_token(self, token):
+    async def find_by_verification_token(self, token) -> UserTable | None:
         result = await self.session.execute(
             select(UserTable).where(UserTable.verification_token == token)
         )
-        model = result.scalar_one_or_none()
-        return User.model_validate(model) if model else None
+        return result.scalar_one_or_none()

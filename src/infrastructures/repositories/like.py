@@ -1,25 +1,24 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from src.infrastructures.db.models.like import LikeTable
-from src.domain.entities.like import Like
 
 
 class LikeRepository:
     def __init__(self, session: AsyncSession):
         self.session = session
 
-    async def save(self, like: Like):
-        model = LikeTable(**like.model_dump())
+    async def save(self, **kwargs) -> LikeTable:
+        model = LikeTable(**kwargs)
         self.session.add(model)
         await self.session.commit()
-        return Like.model_validate(model)
+        await self.session.refresh(model)
+        return model
 
-    async def find_by_article_id(self, id):
+    async def find_by_article_id(self, article_id) -> list[LikeTable]:
         result = await self.session.execute(
-            select(LikeTable).where(LikeTable.article_id == id)
+            select(LikeTable).where(LikeTable.article_id == article_id)
         )
-        models = result.scalars().all()
-        return [Like.model_validate(model) for model in models]
+        return list(result.scalars().all())
 
     async def delete(self, id):
         result = await self.session.execute(select(LikeTable).where(LikeTable.id == id))
