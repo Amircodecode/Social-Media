@@ -1,6 +1,6 @@
 from sqlalchemy import Column, String, Boolean, DateTime
 from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy.sql import func
+from sqlalchemy.orm import relationship
 from src.infrastructures.db.base import Base
 from src.infrastructures.db.mixins import CommonMixin
 
@@ -14,3 +14,5 @@ class UserTable(Base, CommonMixin):
     is_verified = Column(Boolean, default=False)
     full_name = Column(String, nullable=False)
     password = Column(String, nullable=False)
+
+    articles = relationship("ArticleTable", back_populates="user")

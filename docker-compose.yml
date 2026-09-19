@@ -12,6 +12,7 @@ services:
     depends_on:
       - db
       - redis
+      - mailhog
 
   db:
     image: postgres:16
@@ -45,6 +46,12 @@ services:
       - REDIS_URL=redis://redis:6379/0
     depends_on:
       - redis
+
+  mailhog:
+    image: mailhog/mailhog
+    ports:
+      - "1025:1025"   # SMTP
+      - "8025:8025"   # веб-интерфейс
 
 volumes:
   postgres_data:

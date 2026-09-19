@@ -3,6 +3,7 @@ from sqlalchemy import select, delete as sql_delete
 from src.infrastructures.db.models.article import ArticleTable
 from src.infrastructures.db.models.like import LikeTable
 from src.infrastructures.db.models.comment import CommentTable
+from sqlalchemy.orm import joinedload
 
 
 class ArticleRepository:
@@ -58,3 +59,22 @@ class ArticleRepository:
             await self.session.commit()
             await self.session.refresh(model)
         return model
+
+    async def find_all_with_filters(
+        self, search=None, date_from=None, date_to=None, limit=10, offset=0
+    ):
+        query = select(ArticleTable).options(joinedload(ArticleTable.user))
+
+        if search:
+            query = query.where(ArticleTable.title.ilike(f"%{search}%"))
+        if date_from:
+            query = query.where(ArticleTable.created_at >= date_from)
+        if date_to:
+            query = query.where(ArticleTable.created_at <= date_to)
+
+        query = (
+            query.order_by(ArticleTable.created_at.desc()).limit(limit).offset(offset)
+        )
+
+        result = await self.session.execute(query)
+        return result.unique().scalars().all()

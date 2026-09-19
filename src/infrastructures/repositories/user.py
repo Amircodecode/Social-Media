@@ -2,6 +2,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, delete
 from src.infrastructures.db.models.user import UserTable
 from src.infrastructures.db.models.article import ArticleTable
+import uuid
 
 
 class UserRepository:
@@ -18,6 +19,12 @@ class UserRepository:
     async def find_by_email(self, email: str) -> UserTable | None:
         result = await self.session.execute(
             select(UserTable).where(UserTable.email == email)
+        )
+        return result.scalar_one_or_none()
+
+    async def find_by_id(self, user_id: uuid.UUID) -> UserTable | None:
+        result = await self.session.execute(
+            select(UserTable).where(UserTable.id == user_id)
         )
         return result.scalar_one_or_none()
 

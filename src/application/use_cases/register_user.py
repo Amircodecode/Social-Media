@@ -4,6 +4,7 @@ from fastapi import HTTPException
 from src.infrastructures.auth.password import hash_password
 from src.application.dtos.user import RegisterRequest
 from src.infrastructures.repositories.user import UserRepository
+from src.infrastructures.mail.mailer import send_verification_email
 
 
 class RegisterUser:
@@ -19,10 +20,14 @@ class RegisterUser:
         verification_token = uuid.uuid4()
         token_expires_at = datetime.now() + timedelta(hours=24)
 
-        return await self.repository.create(
+        user = await self.repository.create(
             email=data.email,
             full_name=data.full_name,
             password=hashed_password,
             verification_token=verification_token,
             token_expires_at=token_expires_at,
         )
+
+        await send_verification_email(user.email, user.verification_token)
+
+        return user
