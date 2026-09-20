@@ -7,6 +7,12 @@ from src.infrastructures.db.mixins import CommonMixin
 class CommentTable(Base, CommonMixin):
     __tablename__ = "comments"
 
-    article_id = Column(UUID, ForeignKey("articles.id"), nullable=False)
+    article_id = Column(
+        UUID(as_uuid=True),
+        ForeignKey("articles.id", ondelete="CASCADE"),
+        nullable=False,
+    )
     content = Column(Text, nullable=False)
-    user_id = Column(UUID, ForeignKey("users.id"), nullable=False)
+    user_id = Column(
+        UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False
+    )

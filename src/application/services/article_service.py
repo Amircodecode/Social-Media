@@ -66,3 +66,13 @@ class ArticleService:
                 status_code=403, detail="You are not authorized to update this post"
             )
         return await self.article_repository.update(id, title=title, content=content)
+
+    async def create(self, title, content, user_id, is_verified):
+        if not is_verified:
+            raise HTTPException(status_code=403, detail="Email not verified")
+
+        return await self.article_repository.create(
+            title=title,
+            content=content,
+            user_id=user_id,
+        )

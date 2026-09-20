@@ -1,7 +1,8 @@
 """baseline
 
-Revision ID: 186f05267f9f
-Create Date: 2026-09-20 10:27:32.090948
+Revision ID: 340fdc3ed5ec
+Revises: 
+Create Date: 2026-09-20 15:49:14.488700
 
 """
 
@@ -12,7 +13,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = "186f05267f9f"
+revision: str = "340fdc3ed5ec"
 down_revision: Union[str, Sequence[str], None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -26,7 +27,9 @@ def upgrade() -> None:
         sa.Column("verification_token", sa.UUID(), nullable=False),
         sa.Column("token_expires_at", sa.DateTime(), nullable=True),
         sa.Column("email", sa.String(), nullable=False),
-        sa.Column("is_verified", sa.Boolean(), nullable=True),
+        sa.Column(
+            "is_verified", sa.Boolean(), server_default=sa.text("false"), nullable=False
+        ),
         sa.Column("full_name", sa.String(), nullable=False),
         sa.Column("password", sa.String(), nullable=False),
         sa.Column("id", sa.UUID(), nullable=False),
@@ -52,10 +55,7 @@ def upgrade() -> None:
         sa.Column(
             "updated_at", sa.DateTime(), server_default=sa.text("now()"), nullable=False
         ),
-        sa.ForeignKeyConstraint(
-            ["user_id"],
-            ["users.id"],
-        ),
+        sa.ForeignKeyConstraint(["user_id"], ["users.id"], ondelete="CASCADE"),
         sa.PrimaryKeyConstraint("id"),
     )
     op.create_table(
@@ -70,14 +70,8 @@ def upgrade() -> None:
         sa.Column(
             "updated_at", sa.DateTime(), server_default=sa.text("now()"), nullable=False
         ),
-        sa.ForeignKeyConstraint(
-            ["article_id"],
-            ["articles.id"],
-        ),
-        sa.ForeignKeyConstraint(
-            ["user_id"],
-            ["users.id"],
-        ),
+        sa.ForeignKeyConstraint(["article_id"], ["articles.id"], ondelete="CASCADE"),
+        sa.ForeignKeyConstraint(["user_id"], ["users.id"], ondelete="CASCADE"),
         sa.PrimaryKeyConstraint("id"),
     )
     op.create_table(
@@ -91,15 +85,10 @@ def upgrade() -> None:
         sa.Column(
             "updated_at", sa.DateTime(), server_default=sa.text("now()"), nullable=False
         ),
-        sa.ForeignKeyConstraint(
-            ["article_id"],
-            ["articles.id"],
-        ),
-        sa.ForeignKeyConstraint(
-            ["user_id"],
-            ["users.id"],
-        ),
+        sa.ForeignKeyConstraint(["article_id"], ["articles.id"], ondelete="CASCADE"),
+        sa.ForeignKeyConstraint(["user_id"], ["users.id"], ondelete="CASCADE"),
         sa.PrimaryKeyConstraint("id"),
+        sa.UniqueConstraint("user_id", "article_id", name="uq_like_user_article"),
     )
     # ### end Alembic commands ###
 

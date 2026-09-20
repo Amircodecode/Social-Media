@@ -20,5 +20,12 @@ class LikeService:
             user_id=user_id,
         )
 
-    async def delete(self, id):
-        await self.like_repository.delete(id)
+    async def delete(self, like_id, current_user_id):
+        like = await self.like_repository.find_by_id(like_id)
+        if not like:
+            raise HTTPException(status_code=404, detail="Like not found")
+        if like.user_id != current_user_id:
+            raise HTTPException(
+                status_code=403, detail="You are not authorized to delete this like"
+            )
+        await self.like_repository.delete(like_id)

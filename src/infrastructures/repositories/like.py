@@ -14,6 +14,12 @@ class LikeRepository:
         await self.session.refresh(model)
         return model
 
+    async def find_by_id(self, like_id) -> LikeTable | None:
+        result = await self.session.execute(
+            select(LikeTable).where(LikeTable.id == like_id)
+        )
+        return result.scalar_one_or_none()
+
     async def find_by_article_id(self, article_id) -> list[LikeTable]:
         result = await self.session.execute(
             select(LikeTable).where(LikeTable.article_id == article_id)

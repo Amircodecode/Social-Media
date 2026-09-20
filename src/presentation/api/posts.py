@@ -4,6 +4,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.application.services.article_service import ArticleService
+from src.application.services.comment_service import CommentService
 from src.application.dtos.article import (
     CreateArticleRequest,
     UpdateArticleRequest,
@@ -12,6 +13,7 @@ from src.application.dtos.article import (
 from src.infrastructures.repositories.article import ArticleRepository
 from src.infrastructures.repositories.user import UserRepository
 from src.infrastructures.repositories.like import LikeRepository
+from src.infrastructures.repositories.comment import CommentRepository
 from src.infrastructures.auth.dependencies import get_current_user
 from src.infrastructures.db.database import get_session
 from src.infrastructures.db.models.user import UserTable
@@ -25,6 +27,10 @@ def get_article_service(session: AsyncSession = Depends(get_session)) -> Article
         LikeRepository(session),
         UserRepository(session),
     )
+
+
+def get_comment_service(session: AsyncSession = Depends(get_session)) -> CommentService:
+    return CommentService(CommentRepository(session))
 
 
 @router.post("/", response_model=ArticleResponse, status_code=201)
@@ -80,3 +86,14 @@ async def update_post(
     service: ArticleService = Depends(get_article_service),
 ):
     return await service.update(id, current_user.id, data.title, data.content)
+
+
+@router.delete("/{article_id}/comments/{comment_id}")
+async def delete_comment(
+    article_id: uuid.UUID,
+    comment_id: uuid.UUID,
+    current_user: UserTable = Depends(get_current_user),
+    service: CommentService = Depends(get_comment_service),
+):
+    await service.delete(article_id, comment_id, current_user.id)
+    return {"message": "Comment deleted successfully!!"}

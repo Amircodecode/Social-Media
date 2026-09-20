@@ -14,6 +14,12 @@ class CommentRepository:
         await self.session.refresh(model)
         return model
 
+    async def find_by_id(self, comment_id) -> CommentTable | None:
+        result = await self.session.execute(
+            select(CommentTable).where(CommentTable.id == comment_id)
+        )
+        return result.scalar_one_or_none()
+
     async def find_by_article_id(self, article_id) -> list[CommentTable]:
         result = await self.session.execute(
             select(CommentTable).where(CommentTable.article_id == article_id)

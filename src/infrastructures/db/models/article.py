@@ -8,7 +8,9 @@ from src.infrastructures.db.mixins import CommonMixin
 class ArticleTable(Base, CommonMixin):
     __tablename__ = "articles"
 
-    user_id = Column(UUID, ForeignKey("users.id"), nullable=False)
+    user_id = Column(
+        UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False
+    )
     title = Column(Text, nullable=False)
     content = Column(Text, nullable=False)
 
