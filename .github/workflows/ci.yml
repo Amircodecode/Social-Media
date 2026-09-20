@@ -49,4 +49,10 @@ jobs:
           JWT_SECRET_KEY: test-secret-key-for-ci
           JWT_ALGORITHM: HS256
           JWT_ACCESS_TOKEN_EXPIRE_MINUTES: 30
+          MAIL_USERNAME: test@example.com
+          MAIL_PASSWORD: test
+          MAIL_FROM: noreply@example.com
+          MAIL_PORT: 1025
+          MAIL_SERVER: localhost
+          APP_BASE_URL: http://localhost:8000
         run: uv run pytest -v
