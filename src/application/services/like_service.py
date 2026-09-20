@@ -1,12 +1,12 @@
 from fastapi import HTTPException
 
 
-class CreateLike:
+class LikeService:
     def __init__(self, like_repository, article_repository):
         self.like_repository = like_repository
         self.article_repository = article_repository
 
-    async def execute(self, article_id, user_id, is_verified):
+    async def create(self, article_id, user_id, is_verified):
         article = await self.article_repository.find_by_id(article_id)
 
         if article is None:
@@ -19,3 +19,6 @@ class CreateLike:
             article_id=article_id,
             user_id=user_id,
         )
+
+    async def delete(self, id):
+        await self.like_repository.delete(id)

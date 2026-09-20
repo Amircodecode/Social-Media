@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.infrastructures.auth.dependencies import get_current_user
-from src.application.use_cases.create_like import CreateLike
+from src.application.services.like_service import LikeService
 from src.infrastructures.repositories.like import LikeRepository
 from src.infrastructures.repositories.article import ArticleRepository
 from src.infrastructures.db.database import get_session
@@ -12,16 +12,17 @@ from src.infrastructures.db.models.user import UserTable
 router = APIRouter(prefix="/likes", tags=["likes"])
 
 
+def get_like_service(session: AsyncSession = Depends(get_session)) -> LikeService:
+    return LikeService(LikeRepository(session), ArticleRepository(session))
+
+
 @router.post("/", status_code=201)
 async def create_like(
     article_id: uuid.UUID,
     current_user: UserTable = Depends(get_current_user),
-    session: AsyncSession = Depends(get_session),
+    service: LikeService = Depends(get_like_service),
 ):
-    like_repository = LikeRepository(session)
-    article_repository = ArticleRepository(session)
-    use_case = CreateLike(like_repository, article_repository)
-    return await use_case.execute(
+    return await service.create(
         article_id=article_id,
         user_id=current_user.id,
         is_verified=current_user.is_verified,
@@ -29,11 +30,6 @@ async def create_like(
 
 
 @router.delete("/delete/{id}")
-async def delete_like(
-    id: uuid.UUID,
-    current_user: UserTable = Depends(get_current_user),
-    session: AsyncSession = Depends(get_session),
-):
-    like_repository = LikeRepository(session)
-    await like_repository.delete(id)
+async def delete_like(id: uuid.UUID, service: LikeService = Depends(get_like_service)):
+    await service.delete(id)
     return {"message": "Like deleted successfully!!"}

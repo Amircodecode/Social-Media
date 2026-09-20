@@ -11,7 +11,7 @@ class CreateArticleRequest(Base):
         pattern=r"^[a-zA-Zа-яА-Я\s]+$",
         examples=["string"],
     )
-    content: str = Field(max_length=1000, examples=["string"])
+    content: str = Field(max_length=9999, examples=["string"])
 
 
 class UpdateArticleRequest(Base):
@@ -21,7 +21,7 @@ class UpdateArticleRequest(Base):
         pattern=r"^[a-zA-Zа-яА-Я\s]+$",
         examples=["string"],
     )
-    content: str = Field(max_length=1000, examples=["string"])
+    content: str = Field(max_length=9999, examples=["string"])
 
 
 class ArticleResponse(Base):

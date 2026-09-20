@@ -16,7 +16,10 @@ RUN uv sync --frozen --no-dev
 FROM python:3.12-slim
 WORKDIR /app
 
-COPY --from=builder /app /app
+RUN useradd --create-home appuser
+COPY --from=builder --chown=appuser:appuser /app /app
+USER appuser
+
 ENV PATH="/app/.venv/bin:$PATH"
 
 EXPOSE 8000

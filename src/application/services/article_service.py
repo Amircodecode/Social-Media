@@ -1,10 +1,13 @@
-class GetAllArticles:
-    def __init__(self, user_repository, article_repository, like_repository):
-        self.user_repository = user_repository
+from fastapi import HTTPException
+
+
+class ArticleService:
+    def __init__(self, article_repository, like_repository, user_repository):
         self.article_repository = article_repository
         self.like_repository = like_repository
+        self.user_repository = user_repository
 
-    async def execute(
+    async def get_all(
         self, page=1, limit=10, search=None, date_from=None, date_to=None
     ):
         users = await self.user_repository.find_all()
@@ -33,6 +36,33 @@ class GetAllArticles:
             result.append(
                 {"full_name": user.full_name, "articles": articles_with_likes}
             )
+
         start = (page - 1) * limit
         end = start + limit
         return result[start:end]
+
+    async def get_by_id(self, id):
+        article = await self.article_repository.find_by_id(id)
+        if not article:
+            raise HTTPException(status_code=404, detail="Article not found")
+        return article
+
+    async def delete(self, id, current_user_id):
+        article = await self.article_repository.find_by_id(id)
+        if not article:
+            raise HTTPException(status_code=404, detail="Article not found")
+        if article.user_id != current_user_id:
+            raise HTTPException(
+                status_code=403, detail="You are not authorized to delete this post"
+            )
+        await self.article_repository.delete(id)
+
+    async def update(self, id, current_user_id, title, content):
+        article = await self.article_repository.find_by_id(id)
+        if not article:
+            raise HTTPException(status_code=404, detail="Article not found")
+        if article.user_id != current_user_id:
+            raise HTTPException(
+                status_code=403, detail="You are not authorized to update this post"
+            )
+        return await self.article_repository.update(id, title=title, content=content)
