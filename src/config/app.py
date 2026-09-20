@@ -1,6 +1,5 @@
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
-from src.infrastructures.db.database import create_tables
 from src.presentation.api.auth import router as auth_router
 from src.presentation.api.posts import router as posts_router
 from src.presentation.api.comments import router as comments_router
@@ -9,7 +8,6 @@ from src.presentation.api.like import router as likes_router
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    await create_tables()
     yield
 
 
