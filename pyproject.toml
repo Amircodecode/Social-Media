@@ -29,6 +29,7 @@ dev = [
     "httpx",
     "black",
     "flake8",
+    "pre-commit>=4.6.2",
 ]
 
 [tool.uv]
@@ -36,3 +37,10 @@ package = false
 
 [tool.black]
 target-version = ["py312"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "session"
+testpaths = ["tests"]
+pythonpath = ["."]
+

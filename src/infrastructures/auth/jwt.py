@@ -1,5 +1,5 @@
 import os
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, UTC
 from jose import jwt
 from dotenv import load_dotenv
 
@@ -14,7 +14,7 @@ if not SECRET_KEY:
 
 
 def create_access_token(data: dict) -> str:
-    expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    expire = datetime.now(UTC) + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     data_to_encode = data.copy()
     data_to_encode.update({"exp": expire})
     return jwt.encode(data_to_encode, SECRET_KEY, algorithm=ALGORITHM)
