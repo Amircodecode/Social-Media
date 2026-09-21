@@ -55,7 +55,7 @@ services:
 
   celery-beat:
     build: .
-    command: celery -A src.infrastructures.celery.celery_app beat --loglevel=info
+    command: celery -A src.infrastructures.celery.celery_app beat --loglevel=info --schedule=/tmp/celerybeat-schedule
     environment:
       - REDIS_URL=redis://redis:6379/0
     depends_on:
